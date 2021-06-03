@@ -4,7 +4,6 @@ import express, { Application } from 'express';
 import { ForecastController } from './controllers/forecast';
 
 export class SetupServer extends Server {
-
   constructor(private port = 5003) {
     super();
   }
@@ -24,8 +23,6 @@ export class SetupServer extends Server {
 
   private setupControllers(): void {
     const forecastController = new ForecastController();
-    this.addControllers([
-      forecastController
-    ]);
+    this.addControllers([forecastController]);
   }
 }
