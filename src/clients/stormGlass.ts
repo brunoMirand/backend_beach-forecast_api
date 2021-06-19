@@ -1,6 +1,5 @@
 import { AxiosStatic } from 'axios';
 import dotevn from 'dotenv';
-import { inflateSync } from 'zlib';
 
 dotevn.config();
 
