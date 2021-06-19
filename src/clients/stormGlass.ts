@@ -1,5 +1,6 @@
 import { AxiosStatic } from 'axios';
 import dotevn from 'dotenv';
+import { inflateSync } from 'zlib';
 
 dotevn.config();
 
@@ -50,34 +51,38 @@ export class StormGlass {
 
   constructor(protected request: AxiosStatic) { }
 
-  public async fetchPoints(lat: number, lng: number): Promise<{}> {
+  public async fetchPoints(lat: number, lng: number): Promise<ForecastPoint[]> {
     const response = this.request.get<StormGlassForecastResponse>(
       `${STORM_GLASS_API}/weather/point?params=${this.stormGlassAPIParams}&source=${this.stormGlassAPISource}&lat=${lat}&lng=${lng}`,
       this.configRequest
     );
 
-    return response;
+    return this.normalizeReponse((await response).data);
   }
 
-  private normalizeReponse(point: StormGlassForecastResponse): ForecastPoint[] {
-    return []
+  private normalizeReponse(points: StormGlassForecastResponse): ForecastPoint[] {
+    return points.hours.filter(this.isValidPoint).map((point) => ({
+      "swellDirection": point.swellDirection[this.stormGlassAPISource],
+      "swellHeight": point.swellDirection[this.stormGlassAPISource],
+      "swellPeriod": point.swellPeriod[this.stormGlassAPISource],
+      "time": point.time,
+      "waveDirection": point.waveDirection[this.stormGlassAPISource],
+      "waveHeight": point.waveHeight[this.stormGlassAPISource],
+      "windDirection": point.windDirection[this.stormGlassAPISource],
+      "windSpeed": point.windSpeed[this.stormGlassAPISource]
+    }));
   }
 
   private isValidPoint(point: Partial<StormGlassPoint>): boolean {
     return !!(
       point.time &&
-      point.swellDirection?.[this.stormGlassAPIParams] &&
-      point.swellHeight?.[this.stormGlassAPIParams] &&
-      point.swellPeriod?.[this.stormGlassAPIParams] &&
-      point.waveDirection?.[this.stormGlassAPIParams] &&
-      point.waveHeight?.[this.stormGlassAPIParams] &&
-      point.windDirection?.[this.stormGlassAPIParams] &&
-      point.windSpeed?.[this.stormGlassAPIParams]
+      point.swellDirection?.noaa &&
+      point.swellHeight?.noaa &&
+      point.swellPeriod?.noaa &&
+      point.waveDirection?.noaa &&
+      point.waveHeight?.noaa &&
+      point.windDirection?.noaa &&
+      point.windSpeed?.noaa
     );
-  }
-
-  public async testConsole(): Promise<{}> {
-    const response = await this.fetchPoints(58.7984, 17.8081);
-    return response;
   }
 }
