@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "start": "npm run build && node dist/src/index.js",
-    "start-dev": "ts-node-dev 'src/index.ts'",
+    "start:dev": "ts-node-dev 'src/index.ts'",
     "lint": "eslint ./src ./tests --ext .ts",
     "lint:fix": "eslint ./src ./tests --ext .ts --fix",
     "format": "prettier --write 'src/**/*.ts' 'tests/**/*.ts'",
